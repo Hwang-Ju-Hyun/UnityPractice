@@ -10,7 +10,8 @@ public class Actor : MonoBehaviour
     public float lookSensitivity = 5f;
     [SerializeField]
     private float cameraRotationLimit = 80f;
-    private float currentCameraRotationX = 0f;
+    [SerializeField]
+    private float currentCameraRotationX;
     private float rotationY = 0f;
 
     [SerializeField]
@@ -35,6 +36,13 @@ public class Actor : MonoBehaviour
     public float moveSpeed = 13f;
 
     void Update()
+    {        
+        Movemonet();
+        CameraRotation();
+
+    }   
+
+    void Movemonet()
     {
         float fMoveDirX = Input.GetAxisRaw("Horizontal");
         float fMoveDirY = Input.GetAxisRaw("Vertical");
@@ -64,26 +72,27 @@ public class Actor : MonoBehaviour
         {
             moveSpeed = 13f;
         }
-        CameraRotation();
+    }
 
-    }   
     void CameraRotation()
-    {
-        // 마우스 입력
+    {        
         float mouseX = Input.GetAxisRaw("Mouse X") * lookSensitivity;
         float mouseY = Input.GetAxisRaw("Mouse Y") * lookSensitivity;
-        Debug.Log("MouseX: " + mouseX + ", MouseY: " + mouseY);
-
-        // 좌우 회전 (Y축)
-        rotationY += mouseX;
-
-        // 위아래 회전 (X축, 상하 반전)
+        //Debug.Log("MouseX: " + mouseX + ", MouseY: " + mouseY);
+        
+        
         currentCameraRotationX -= mouseY;
         currentCameraRotationX = Mathf.Clamp(currentCameraRotationX, -cameraRotationLimit, cameraRotationLimit);
 
-        // 플레이어(또는 카메라) 회전 적용
-        transform.rotation = Quaternion.Euler(0f, rotationY, 0f); // 캐릭터 몸통 회전
-        theCamera.transform.localEulerAngles = new Vector3(currentCameraRotationX, 0f, 0f); // 카메라 X축 회전
+     
+        rotationY += mouseX;
+        rotationY = Mathf.Clamp(rotationY, -cameraRotationLimit, cameraRotationLimit);
+        
+        //transform.rotation = Quaternion.Euler(0f, rotationY, 0f); // 캐릭터 몸통 회전
+        //localEulerAngles : 유니티에서 내부적으로 쿼터니언을 적용해줌
+        //프로그래머는 오일러각만 신경써도 됨 (짐벌락 현상을 유니티내부에서 쿼터니언을 적용)
+        //개꿀
+        theCamera.transform.localEulerAngles = new Vector3(currentCameraRotationX, rotationY, 0f); // 카메라 X축 회전
     }
 
     void FixedUpdate()
@@ -92,8 +101,8 @@ public class Actor : MonoBehaviour
     }
 
     void LateUpdate()
-    {
-   
+    {       
+        
     }
 
     void OnDisable()
